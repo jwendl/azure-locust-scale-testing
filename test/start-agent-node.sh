@@ -25,4 +25,4 @@ sudo apt-get install python3-pip --yes
 pip3 install locust
 pip3 install Faker
 
-~/.local/bin/locust -f locustfile.py --worker --master-host=$MainIpAddress &
+screen -dmS locust-agent ~/.local/bin/locust -f locustfile.py --worker --master-host=$MainIpAddress

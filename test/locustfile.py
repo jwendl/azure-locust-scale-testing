@@ -1,8 +1,8 @@
-from locust import User, task, between
+from locust import HttpUser, task, between
 from faker import Faker
 import uuid
 
-class MyUser(User):
+class MyUser(HttpUser):
 
     @task
     def create_service_request(self):
@@ -13,10 +13,10 @@ class MyUser(User):
 
         payload = {
             "firstName": fake.first_name(),
-            "birthDate": fake.date_of_birth()
+            "birthDate": str(fake.date_of_birth()).replace(' ', 'T')
         }
 
-        self.client.post("/api/servicerequest", json=payload, headers = headers)
+        self.client.post("/api/data", json=payload, headers = headers)
 
         with self.client.get("/", catch_response=True) as response:
             if response.text != "Success":
@@ -24,6 +24,6 @@ class MyUser(User):
             elif response.elapsed.total_seconds() > 1.0:
                 response.failure("Request took too long")
 
-class ApiCaller(User):
+class ApiCaller(HttpUser):
     task_set = MyUser
     wait_time = between(3, 25)

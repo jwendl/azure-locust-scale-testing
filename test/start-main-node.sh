@@ -25,4 +25,4 @@ sudo apt-get install python3-pip --yes
 pip3 install locust
 pip3 install Faker
 
-~/.local/bin/locust -f locustfile.py --master --headless --host=$WebEndpoint -u 1000 -r 100 --run-time 3m --expect-workers 10 &
+screen -dmS locust-main ~/.local/bin/locust -f locustfile.py --master --headless --host=$WebEndpoint -u 100000 -r 1000 --run-time 3m --expect-workers 10

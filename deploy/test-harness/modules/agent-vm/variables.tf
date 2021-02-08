@@ -28,7 +28,7 @@ variable "subnet_id" {
 
 variable "vm_size" {
     description = "The size of the virtual machine"
-    default     = "Standard_F2"
+    default     = "Standard_DS4_v2"
 }
 
 variable "admin_username" {

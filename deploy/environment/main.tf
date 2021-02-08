@@ -23,7 +23,7 @@ resource "azurerm_key_vault" "kv" {
     sku_name            = var.keyvault_sku_name
 }
 
-resource "azurerm_key_vault_access_policy" "azdokvap" {
+resource "azurerm_key_vault_access_policy" "kvap" {
     key_vault_id = azurerm_key_vault.kv.id
 
     tenant_id = data.azurerm_subscription.current.tenant_id
@@ -39,19 +39,6 @@ resource "azurerm_log_analytics_workspace" "monitor" {
     resource_group_name = azurerm_resource_group.rg.name
     location            = azurerm_resource_group.rg.location
     sku                 = "PerGB2018"
-}
-
-resource "azurerm_log_analytics_solution" "ci" {
-    solution_name         = "ContainerInsights"
-    resource_group_name   = azurerm_resource_group.rg.name
-    location              = azurerm_log_analytics_workspace.monitor.location
-    workspace_resource_id = azurerm_log_analytics_workspace.monitor.id
-    workspace_name        = azurerm_log_analytics_workspace.monitor.name
-
-    plan {
-        publisher = "Microsoft"
-        product   = "OMSGallery/ContainerInsights"
-    }
 }
 
 resource "azurerm_application_insights" "ai" {
@@ -80,7 +67,7 @@ resource "azurerm_app_service_plan" "app_plan" {
     resource_group_name          = azurerm_storage_account.storage.resource_group_name
     location                     = azurerm_storage_account.storage.location
     kind                         = "elastic"
-    maximum_elastic_worker_count = 4
+    maximum_elastic_worker_count = 15
 
     sku {
         tier = "ElasticPremium"
@@ -88,7 +75,7 @@ resource "azurerm_app_service_plan" "app_plan" {
     }
 }
 
-resource "azurerm_function_app" "functions_app" {
+resource "azurerm_function_app" "fa" {
     name                       = "${var.resource_prefix}afa${var.resource_postfix}"
     resource_group_name        = azurerm_resource_group.rg.name
     location                   = azurerm_resource_group.rg.location
@@ -129,7 +116,7 @@ resource "azurerm_key_vault_access_policy" "umikvap" {
     key_vault_id = azurerm_key_vault.kv.id
 
     tenant_id = data.azurerm_subscription.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
+    object_id = azurerm_function_app.fa.identity[0].principal_id
 
     secret_permissions = [
         "get", "list", "set",
